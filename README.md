@@ -1,6 +1,10 @@
 # [Kurse: JavaScript Game Development Course for Beginners](https://www.youtube.com/watch?v=GFO_txvwK_c)
 
+## Links
+
 [Course by Frank's Laboratory.](https://www.youtube.com/c/Frankslaboratory)
+
+[bevouliin.com](https://bevouliin.com/)
 
 ## [Project 1: Vanilla JavaScript sprite animation techniques](https://www.youtube.com/watch?v=GFO_txvwK_c&t=88s)
 
@@ -21,4 +25,3 @@
 ## [Project 8: State management](https://www.youtube.com/watch?v=GFO_txvwK_c&t=21244s)
 
 ## [Project 9: Final endless runner game with all the features](https://www.youtube.com/watch?v=GFO_txvwK_c&t=25377s)
-
