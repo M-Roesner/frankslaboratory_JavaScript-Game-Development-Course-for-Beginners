@@ -1,7 +1,7 @@
 /** @type {HTMLCanvasElement} */
 import {
   FlyingWiggleEnemy,
-  FlyingEnemy,
+  FlyingSwingingEnemy,
   FlyingCircleEnemy,
   FlyingSawEnemy,
 } from "./Classes/enemies/Enemies.js";
@@ -15,7 +15,7 @@ const CANVAS_WIDTH = (canvas.width = parseInt(canvasStyle.width));
 const CANVAS_HEIGT = (canvas.height = parseInt(canvasStyle.height));
 console.log(`Canvas width: ${canvas.width}, Canvas height: ${canvas.height}`);
 
-const numberOfEnemies = 100;
+const numberOfEnemies = 10;
 const enemiesArray = [];
 
 let gameFrame = 0;
@@ -42,7 +42,7 @@ class Enemy {
     this.interval = Math.floor(Math.random() * 200 + 50);
   }
 
-  update() {
+  update(gameFrame) {
     if (gameFrame % this.interval === 0) {
       this.newX = Math.random() * (canvas.width - this.width);
       this.newY = Math.random() * (canvas.height - this.height);
@@ -79,17 +79,17 @@ class Enemy {
 
 window.addEventListener("load", () => {
   for (let i = 0; i < numberOfEnemies; i++) {
-    // enemiesArray.push(new FlyingWiggleEnemy(canvas, ctx, gameFrame, "./images/enemy1.png"));
-    enemiesArray.push(new FlyingEnemy(canvas, ctx, gameFrame, "./images/enemy2.png"));
-    // enemiesArray.push(new FlyingCircleEnemy(canvas, ctx, gameFrame, "./images/enemy3.png"));
-    // enemiesArray.push(new FlyingSawEnemy(canvas, ctx, gameFrame, "./images/enemy4.png"));
+    enemiesArray.push(new FlyingWiggleEnemy(canvas, ctx, "./images/enemy1.png"));
+    enemiesArray.push(new FlyingSwingingEnemy(canvas, ctx, "./images/enemy2.png"));
+    enemiesArray.push(new FlyingCircleEnemy(canvas, ctx, "./images/enemy3.png"));
+    enemiesArray.push(new FlyingSawEnemy(canvas, ctx, "./images/enemy4.png"));
     // enemiesArray.push(new Enemy());
   }
 
   const animate = () => {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGT);
     enemiesArray.forEach((enemy) => {
-      enemy.update();
+      enemy.update(gameFrame);
       enemy.draw();
     });
     gameFrame++;

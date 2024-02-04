@@ -12,19 +12,6 @@ class Enemy {
   update() {}
   draw() {
     this.ctx.strokeRect(this.x, this.y, this.width, this.height);
-
-    // ctx.drawImage(imagaSrc, sx, sy, sw, sh, dx, dy, dw, dh);
-    this.ctx.drawImage(
-      this.image,
-      this.frame * this.spriteWidth,
-      0,
-      this.spriteWidth,
-      this.spriteHeight,
-      this.x,
-      this.y,
-      this.width,
-      this.height
-    );
   }
 }
 
@@ -35,11 +22,10 @@ class Enemy {
  * @param {string} imagePath
  */
 export class FlyingWiggleEnemy extends Enemy {
-  constructor(canvas, ctx, gameFrame, imagePath) {
+  constructor(canvas, ctx, imagePath) {
     super();
     this.canvas = canvas;
     this.ctx = ctx;
-    this.gameFrame = gameFrame;
 
     this.image.src = imagePath; //"./images/enemy1.png";
 
@@ -63,7 +49,7 @@ export class FlyingWiggleEnemy extends Enemy {
     if (this.y > this.canvas.height - this.height) this.y = this.canvas.height - this.height;
   }
 
-  update() {
+  update(gameFrame) {
     // this.x += this.speed;
     // this.y += this.speed;
     this.x += Math.random() * 5 - 2.5;
@@ -73,7 +59,7 @@ export class FlyingWiggleEnemy extends Enemy {
     this.checkCollisions();
 
     // animate sprites
-    if (this.gameFrame % this.flapSpeed === 0) {
+    if (gameFrame % this.flapSpeed === 0) {
       this.frame > 4 ? (this.frame = 0) : this.frame++;
     }
   }
@@ -100,12 +86,11 @@ export class FlyingWiggleEnemy extends Enemy {
  * @param {number} gameFrame
  * @param {string} imagePath
  */
-export class FlyingEnemy extends Enemy {
-  constructor(canvas, ctx, gameFrame, imagePath) {
+export class FlyingSwingingEnemy extends Enemy {
+  constructor(canvas, ctx, imagePath) {
     super();
     this.canvas = canvas;
     this.ctx = ctx;
-    this.gameFrame = gameFrame;
 
     this.image.src = imagePath; //"./images/enemy2.png";
 
@@ -127,7 +112,7 @@ export class FlyingEnemy extends Enemy {
     this.angleCurve = Math.random() * 5;
   }
 
-  update() {
+  update(gameFrame) {
     this.x -= this.speed;
     this.y += this.angleCurve * Math.sin(this.angle);
     this.angle += this.angleSpeed;
@@ -136,7 +121,7 @@ export class FlyingEnemy extends Enemy {
     if (this.x + this.width < 0) this.x = this.canvas.width;
 
     // animate sprites
-    if (this.gameFrame % this.flapSpeed === 0) {
+    if (gameFrame % this.flapSpeed === 0) {
       this.frame > 4 ? (this.frame = 0) : this.frame++;
     }
   }
@@ -164,13 +149,12 @@ export class FlyingEnemy extends Enemy {
  * @param {string} imagePath
  */
 export class FlyingCircleEnemy extends Enemy {
-  constructor(canvas, ctx, gameFrame, imagePath) {
+  constructor(canvas, ctx, imagePath) {
     super();
     this.canvas = canvas;
     this.ctx = ctx;
-    this.gameFrame = gameFrame;
 
-    this.image.src = "./images/enemy3.png";
+    this.image.src = imagePath;
 
     this.speed = Math.random() * 4 + 1;
     this.spriteWidth = 218;
@@ -190,7 +174,7 @@ export class FlyingCircleEnemy extends Enemy {
     this.angleCurve = 50 + Math.random() * 200;
   }
 
-  update() {
+  update(gameFrame) {
     // descriptions/angle_sin_cos-description-grafic.png
 
     // circle movements
@@ -214,7 +198,7 @@ export class FlyingCircleEnemy extends Enemy {
     if (this.x + this.width < 0) this.x = this.canvas.width;
 
     // animate sprites
-    if (this.gameFrame % this.flapSpeed === 0) {
+    if (gameFrame % this.flapSpeed === 0) {
       this.frame > 4 ? (this.frame = 0) : this.frame++;
     }
   }
@@ -241,11 +225,10 @@ export class FlyingCircleEnemy extends Enemy {
  * @param {string} imagePath
  */
 export class FlyingSawEnemy extends Enemy {
-  constructor(canvas, ctx, gameFrame, imagePath) {
+  constructor(canvas, ctx, imagePath) {
     super();
     this.canvas = canvas;
     this.ctx = ctx;
-    this.gameFrame = gameFrame;
 
     this.image.src = imagePath;
 
@@ -256,8 +239,8 @@ export class FlyingSawEnemy extends Enemy {
     this.height = this.spriteHeight / 2;
     this.x = Math.random() * (this.canvas.width - this.width);
     this.y = Math.random() * (this.canvas.height - this.height);
-    this.newX = Math.random() * this.canvas.width;
-    this.newY = Math.random() * this.canvas.height;
+    this.newX = Math.random() * (this.canvas.width - this.width);
+    this.newY = Math.random() * (this.canvas.height - this.height);
 
     this.dx;
     this.dy;
@@ -269,20 +252,18 @@ export class FlyingSawEnemy extends Enemy {
     this.interval = Math.floor(Math.random() * 200 + 50);
   }
 
-  update() {
-    if (this.gameFrame % this.interval === 0) {
-      this.x = this.newX;
-      this.y = this.newY;
+  update(gameFrame) {
+    if (gameFrame % this.interval === 0) {
       this.newX = Math.random() * (this.canvas.width - this.width);
       this.newY = Math.random() * (this.canvas.height - this.height);
     }
     this.dx = this.x - this.newX;
     this.dy = this.y - this.newY;
-    this.x -= this.dx / 200;
-    this.y -= this.dy / 200;
+    this.x -= this.dx / 20;
+    this.y -= this.dy / 20;
 
     // animate sprites
-    if (this.gameFrame % this.flapSpeed === 0) {
+    if (gameFrame % this.flapSpeed === 0) {
       this.frame > 4 ? (this.frame = 0) : this.frame++;
     }
   }
