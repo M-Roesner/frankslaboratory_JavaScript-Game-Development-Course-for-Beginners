@@ -1,9 +1,19 @@
+body {
+  /* background: linear-gradient(to bottom, red, green, blue); */
+  background: linear-gradient(125deg, red, green, blue);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
 #canvas1 {
-  width: 600px;
-  height: 600px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 5px solid black;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#collisionCanvas {
+  opacity: 0;
 }
