@@ -2,9 +2,14 @@
 
 ## Links
 
+course leader:
 [Course by Frank's Laboratory.](https://www.youtube.com/c/Frankslaboratory)
 
+images by:
 [bevouliin.com](https://bevouliin.com/)
+
+sounds by:
+[opengameart.org](https://opengameart.org/content/8-magic-attacks)
 
 ## [Project 1: Vanilla JavaScript sprite animation techniques](https://www.youtube.com/watch?v=GFO_txvwK_c&t=88s)
 
