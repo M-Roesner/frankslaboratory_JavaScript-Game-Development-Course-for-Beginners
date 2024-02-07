@@ -13,12 +13,25 @@ export class Game {
     this.enemyTimer = 0;
     this.enemyTypes = ["worm", "ghost", "spider"];
     this.enemyMaxSpiders = 10;
-  }
-  update(deltaTime) {
-    // removes enemies wich are out of the screen
-    this.enemies = this.enemies.filter((enemy) => !enemy.markedForDeletion);
 
-    // adds new enemies every 1000ms
+    this.worms = [];
+    this.ghosts = [];
+    this.spiders = [];
+  }
+  // removes enemies wich are out of the screen
+  #removeEnemies() {
+    // this.enemies = this.enemies.filter((enemy) => !enemy.markedForDeletion);
+
+    this.worms = this.worms.filter((enemy) => !enemy.markedForDeletion);
+    this.ghosts = this.ghosts.filter((enemy) => !enemy.markedForDeletion);
+    this.spiders = this.spiders.filter((enemy) => !enemy.markedForDeletion);
+    this.enemies = [...this.spiders, ...this.ghosts, ...this.worms];
+  }
+
+  update(deltaTime) {
+    this.#removeEnemies();
+
+    // adds new enemies acording to the enemyInterval.
     if (this.enemyTimer >= this.enemyInterval) {
       this.#addNewEnemy();
       this.enemyTimer = 0;
@@ -37,14 +50,15 @@ export class Game {
 
     switch (randomEnemy) {
       case "worm":
-        this.enemies.push(new Worm(this));
+        this.worms.push(new Worm(this));
         break;
       case "ghost":
-        this.enemies.push(new Ghost(this));
+        this.ghosts.push(new Ghost(this));
+        console.log(this.ghosts);
         break;
       case "spider":
-        const spiders = this.enemies.filter((enemy) => enemy instanceof Spider);
-        if (spiders.length <= this.enemyMaxSpiders) this.enemies.push(new Spider(this));
+        // const spiders = this.enemies.filter((enemy) => enemy instanceof Spider);
+        if (this.spiders.length <= this.enemyMaxSpiders) this.spiders.push(new Spider(this));
         break;
     }
 

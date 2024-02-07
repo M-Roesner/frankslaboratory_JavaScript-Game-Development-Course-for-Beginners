@@ -16,4 +16,10 @@ export class Worm extends Enemy {
     // velocity of ememy
     this.vx = Math.random() * 0.1 + 0.1;
   }
+  // update(deltaTime) {
+  //   super.update(deltaTime);
+  // }
+  // draw(ctx) {
+  //   super.draw(ctx);
+  // }
 }
