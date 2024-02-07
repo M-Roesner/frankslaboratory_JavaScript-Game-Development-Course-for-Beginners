@@ -25,7 +25,7 @@ sounds by:
 
 ## [Part 7: Enemy variety](https://www.youtube.com/watch?v=GFO_txvwK_c&t=13844s)
 
-## [Part 9: Side-scroller game with mobile support](https://www.youtube.com/watch?v=GFO_txvwK_c&t=17149s)
+## [Part 8: Side-scroller game with mobile support](https://www.youtube.com/watch?v=GFO_txvwK_c&t=17149s)
 
 ## [Part 9: State management](https://www.youtube.com/watch?v=GFO_txvwK_c&t=21244s)
 
