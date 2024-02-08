@@ -13,10 +13,7 @@ let score = 0;
 let gameOver = false;
 
 let debugmode = true;
-window.addEventListener("keydown", (e) => {
-  if (e.key === "d") debugmode = !debugmode;
-});
-const debugDraw = (collisionX, collisionY, width) => {
+const drawDebugCircle = (collisionX, collisionY, width) => {
   ctx.save();
   ctx.strokeStyle = "blue";
   ctx.beginPath();
@@ -29,8 +26,15 @@ window.addEventListener("load", () => {
   class InputHandler {
     constructor() {
       this.keys = [];
-      // this.keys.indexOf(e.key):
-      // Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+      this.touchY = "";
+      this.touchTreshold = 30;
+
+      /**
+       * description: this.keys.indexOf(e.key):
+       * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+       */
+
+      // controle keys
       window.addEventListener("keydown", (e) => {
         if (
           (e.key === "ArrowDown" ||
@@ -40,6 +44,8 @@ window.addEventListener("load", () => {
           this.keys.indexOf(e.key) === -1
         )
           this.keys.push(e.key);
+        else if (e.key === "Enter" && gameOver) restartGame();
+        else if (e.key === "d") debugmode = !debugmode;
       });
       window.addEventListener("keyup", (e) => {
         // .splice() removes the value from the array.
@@ -50,6 +56,24 @@ window.addEventListener("load", () => {
           e.key === "ArrowRight"
         )
           this.keys.splice(this.keys.indexOf(e.key), 1);
+      });
+
+      // controle touch
+      window.addEventListener("touchstart", (e) => {
+        this.touchY = e.changedTouches[0].pageY;
+      });
+      window.addEventListener("touchmove", (e) => {
+        const swipeDistance = e.changedTouches[0].pageY - this.touchY;
+        if (swipeDistance < -this.touchTreshold && this.keys.indexOf("swipe up") === -1)
+          this.keys.push("swipe up");
+        else if (swipeDistance > this.touchTreshold && this.keys.indexOf("swipe down") === -1) {
+          this.keys.push("swipe down");
+          if (gameOver) restartGame();
+        }
+      });
+      window.addEventListener("touchend", (e) => {
+        this.keys.splice(this.keys.indexOf("swipe up"), 1);
+        this.keys.splice(this.keys.indexOf("swipe down"), 1);
       });
     }
     update(deltaTime) {}
@@ -65,7 +89,7 @@ window.addEventListener("load", () => {
       this.spriteHeight = 200;
       this.width = this.spriteWidth;
       this.height = this.spriteHeight;
-      this.x = 10;
+      this.x = 100;
       this.y = this.gameHeight - this.height;
       this.collisionX = this.x + this.width / 2;
       this.collisionY = this.y + this.height / 2;
@@ -100,10 +124,14 @@ window.addEventListener("load", () => {
         this.frameTimer = 0;
       } else this.frameTimer += deltaTime;
 
-      // controles
+      // controles with keys and touch
       if (input.keys.indexOf("ArrowRight") > -1) this.speed = 5;
       else if (input.keys.indexOf("ArrowLeft") > -1) this.speed = -5;
-      else if (input.keys.indexOf("ArrowUp") > -1 && this.#onGround()) this.vy -= 30;
+      else if (
+        (input.keys.indexOf("ArrowUp") > -1 || input.keys.indexOf("swipe up") > -1) &&
+        this.#onGround()
+      )
+        this.vy -= 32;
       else this.speed = 0;
 
       // horizontal movements
@@ -131,7 +159,7 @@ window.addEventListener("load", () => {
     }
 
     draw(ctx) {
-      if (debugmode) debugDraw(this.collisionX, this.collisionY, this.width);
+      if (debugmode) drawDebugCircle(this.collisionX, this.collisionY, this.width);
 
       ctx.drawImage(
         this.image,
@@ -144,6 +172,10 @@ window.addEventListener("load", () => {
         this.width,
         this.height
       );
+    }
+    restart() {
+      this.x = 100;
+      this.y = this.gameHeight - this.height;
     }
   }
   class Background {
@@ -170,6 +202,9 @@ window.addEventListener("load", () => {
       // background image 1 one image later
       ctx.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
     }
+    restart() {
+      this.x = 0;
+    }
   }
 
   class Enemy {
@@ -182,7 +217,7 @@ window.addEventListener("load", () => {
       this.width = this.spriteWidth;
       this.height = this.spriteHeight;
 
-      this.x = this.gameWidth - this.width;
+      this.x = this.gameWidth;
       this.y = this.gameHeight - this.height;
       this.collisionX = this.x + this.width / 2;
       this.collisionY = this.y + this.height / 2;
@@ -217,7 +252,7 @@ window.addEventListener("load", () => {
       }
     }
     draw(ctx) {
-      if (debugmode) debugDraw(this.collisionX, this.collisionY, this.width);
+      if (debugmode) drawDebugCircle(this.collisionX, this.collisionY, this.width);
 
       // drawing
       ctx.drawImage(
@@ -235,6 +270,7 @@ window.addEventListener("load", () => {
   }
 
   const handleEnemies = (deltaTime) => {
+    const randomEnemyIntervall = Math.random() * 5000 + 500;
     // create a new enemy
     if (enemyTimer > enemyIntervall + randomEnemyIntervall) {
       enemies.push(new Enemy(canvas.width, canvas.height));
@@ -254,6 +290,7 @@ window.addEventListener("load", () => {
   const displayStatusText = (ctx) => {
     // There is a shadow function, but the performance will be bad,
     // so it is drawn in a different way.
+    ctx.textAlign = "left";
     ctx.font = "40px Helvetica";
     ctx.fillStyle = "black";
     ctx.fillText(`Score: ${score}`, 20, 50);
@@ -263,10 +300,19 @@ window.addEventListener("load", () => {
     if (gameOver) {
       ctx.textAlign = "center";
       ctx.fillStyle = "black";
-      ctx.fillText("Game Over, try again", canvas.width / 2, canvas.height / 2);
+      ctx.fillText("Game Over, press Enter or swipe down to reset!", canvas.width / 2, 200);
       ctx.fillStyle = "white";
-      ctx.fillText("Game Over, try again", canvas.width / 2 + 2, canvas.height / 2 + 2);
+      ctx.fillText("Game Over, press Enter or swipe down to reset!", canvas.width / 2 + 2, 202);
     }
+  };
+
+  const restartGame = () => {
+    player.restart();
+    background.restart();
+    enemies = [];
+    score = 0;
+    gameOver = false;
+    animate(0);
   };
 
   const input = new InputHandler();
@@ -276,7 +322,6 @@ window.addEventListener("load", () => {
   let lastTime = 0;
   let enemyTimer = 0;
   const enemyIntervall = 1000;
-  const randomEnemyIntervall = Math.random() * 1000 + 500;
   const animate = (timestamp) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let deltaTime = timestamp - lastTime;
