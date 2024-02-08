@@ -12,15 +12,9 @@ let enemies = [];
 let score = 0;
 let gameOver = false;
 
+const fullScreenButton = document.getElementById("fullScreenButton");
+
 let debugmode = true;
-const drawDebugCircle = (collisionX, collisionY, width) => {
-  ctx.save();
-  ctx.strokeStyle = "blue";
-  ctx.beginPath();
-  ctx.arc(collisionX, collisionY, width / 2, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-};
 
 window.addEventListener("load", () => {
   class InputHandler {
@@ -76,8 +70,6 @@ window.addEventListener("load", () => {
         this.keys.splice(this.keys.indexOf("swipe down"), 1);
       });
     }
-    update(deltaTime) {}
-    draw() {}
   }
   class Player {
     constructor(gameWidth, gameHeight, enemies) {
@@ -92,7 +84,8 @@ window.addEventListener("load", () => {
       this.x = 100;
       this.y = this.gameHeight - this.height;
       this.collisionX = this.x + this.width / 2;
-      this.collisionY = this.y + this.height / 2;
+      this.collisionY = this.y + this.height / 2 + 20;
+      this.collisionRadius = this.width / 3;
 
       this.image = document.getElementById("playerImage");
       this.frameX = 0;
@@ -107,14 +100,12 @@ window.addEventListener("load", () => {
       this.weight = 1;
     }
     update(input, deltaTime, enemies) {
-      // collision detection
+      // collision detection with circles
       enemies.forEach((enemy) => {
         const dx = enemy.collisionX - this.collisionX;
         const dy = enemy.collisionY - this.collisionY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < enemy.width / 2 + this.width / 2) {
-          gameOver = true;
-        }
+        if (distance < enemy.collisionRadius + this.collisionRadius) gameOver = true;
       });
 
       // sprite animation
@@ -152,15 +143,13 @@ window.addEventListener("load", () => {
         this.frameY = 0;
       }
       if (this.y >= this.gameHeight - this.height) this.y = this.gameHeight - this.height;
-      this.collisionY = this.y + this.height / 2;
+      this.collisionY = this.y + this.height / 2 + 20;
     }
     #onGround() {
       return this.y >= this.gameHeight - this.height;
     }
 
     draw(ctx) {
-      if (debugmode) drawDebugCircle(this.collisionX, this.collisionY, this.width);
-
       ctx.drawImage(
         this.image,
         this.frameX * this.spriteWidth,
@@ -172,10 +161,22 @@ window.addEventListener("load", () => {
         this.width,
         this.height
       );
+
+      if (debugmode) {
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        ctx.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
     restart() {
       this.x = 100;
       this.y = this.gameHeight - this.height;
+      this.frameX = 0;
+      this.maxFrame = 8;
     }
   }
   class Background {
@@ -219,8 +220,9 @@ window.addEventListener("load", () => {
 
       this.x = this.gameWidth;
       this.y = this.gameHeight - this.height;
-      this.collisionX = this.x + this.width / 2;
+      this.collisionX = this.x + this.width / 2 - 20;
       this.collisionY = this.y + this.height / 2;
+      this.collisionRadius = this.width / 3;
 
       this.image = document.getElementById("enemyImage");
       this.frameX = 0;
@@ -243,7 +245,7 @@ window.addEventListener("load", () => {
 
       // speed
       this.x -= this.speed;
-      this.collisionX = this.x + this.width / 2;
+      this.collisionX = this.x + this.width / 2 - 25;
 
       // remove enemy if not displayed and increase score
       if (this.x < -this.width) {
@@ -252,9 +254,6 @@ window.addEventListener("load", () => {
       }
     }
     draw(ctx) {
-      if (debugmode) drawDebugCircle(this.collisionX, this.collisionY, this.width);
-
-      // drawing
       ctx.drawImage(
         this.image,
         this.frameX * this.spriteWidth,
@@ -266,6 +265,16 @@ window.addEventListener("load", () => {
         this.width,
         this.height
       );
+
+      if (debugmode) {
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.beginPath();
+        ctx.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
   }
 
@@ -314,6 +323,23 @@ window.addEventListener("load", () => {
     gameOver = false;
     animate(0);
   };
+
+  /**
+   * description:
+   * If you try to use "document.fullscreenElement" directly, you will get an error...
+   * "Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture."
+   * You can only handle it with a click event or something else.
+   */
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      canvas.requestFullscreen().catch((err) => {
+        alert(` Error, can't enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+  fullScreenButton.addEventListener("click", toggleFullScreen);
 
   const input = new InputHandler();
   const player = new Player(canvas.width, canvas.height);
