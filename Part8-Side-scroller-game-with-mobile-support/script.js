@@ -1,20 +1,26 @@
 /** @type {HTMLCanvasElement} */
 
+import { Background } from "./classes/Background.js";
+import { Enemy } from "./classes/Enemy.js";
+import { Player } from "./classes/Player.js";
+import { displayStatusText, toggleFullScreen } from "./utils/helpers.js";
+
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-
-const canvasStyle = window.getComputedStyle(canvas);
 canvas.width = 800;
 canvas.height = 720;
-console.log(`Canvas width: ${canvas.width}, Canvas height: ${canvas.height}`);
 
 let enemies = [];
+let enemyTimer = 0;
+const enemyIntervall = 1000;
+
 let score = 0;
 let gameOver = false;
+let lastTime = 0;
+let debugmode = true;
 
 const fullScreenButton = document.getElementById("fullScreenButton");
-
-let debugmode = true;
+fullScreenButton.addEventListener("click", () => toggleFullScreen(canvas));
 
 window.addEventListener("load", () => {
   class InputHandler {
@@ -23,258 +29,57 @@ window.addEventListener("load", () => {
       this.touchY = "";
       this.touchTreshold = 30;
 
-      /**
-       * description: this.keys.indexOf(e.key):
-       * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
-       */
-
       // controle keys
-      window.addEventListener("keydown", (e) => {
-        if (
-          (e.key === "ArrowDown" ||
-            e.key === "ArrowUp" ||
-            e.key === "ArrowLeft" ||
-            e.key === "ArrowRight") &&
-          this.keys.indexOf(e.key) === -1
-        )
-          this.keys.push(e.key);
-        else if (e.key === "Enter" && gameOver) restartGame();
-        else if (e.key === "d") debugmode = !debugmode;
-      });
-      window.addEventListener("keyup", (e) => {
-        // .splice() removes the value from the array.
-        if (
-          e.key === "ArrowDown" ||
-          e.key === "ArrowUp" ||
-          e.key === "ArrowLeft" ||
-          e.key === "ArrowRight"
-        )
-          this.keys.splice(this.keys.indexOf(e.key), 1);
-      });
+      window.addEventListener("keydown", (e) => this.handleKeyDown(e));
+      window.addEventListener("keyup", (e) => this.handleKeyUp(e));
 
       // controle touch
-      window.addEventListener("touchstart", (e) => {
-        this.touchY = e.changedTouches[0].pageY;
-      });
-      window.addEventListener("touchmove", (e) => {
-        const swipeDistance = e.changedTouches[0].pageY - this.touchY;
-        if (swipeDistance < -this.touchTreshold && this.keys.indexOf("swipe up") === -1)
-          this.keys.push("swipe up");
-        else if (swipeDistance > this.touchTreshold && this.keys.indexOf("swipe down") === -1) {
-          this.keys.push("swipe down");
-          if (gameOver) restartGame();
-        }
-      });
-      window.addEventListener("touchend", (e) => {
-        this.keys.splice(this.keys.indexOf("swipe up"), 1);
-        this.keys.splice(this.keys.indexOf("swipe down"), 1);
-      });
+      window.addEventListener("touchstart", (e) => (this.touchY = e.changedTouches[0].pageY));
+      window.addEventListener("touchmove", (e) => this.handleTouchmove(e));
+      window.addEventListener("touchend", () => this.handleTouchend());
     }
-  }
-  class Player {
-    constructor(gameWidth, gameHeight, enemies) {
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.enemies = enemies;
-
-      this.spriteWidth = 200;
-      this.spriteHeight = 200;
-      this.width = this.spriteWidth;
-      this.height = this.spriteHeight;
-      this.x = 100;
-      this.y = this.gameHeight - this.height;
-      this.collisionX = this.x + this.width / 2;
-      this.collisionY = this.y + this.height / 2 + 20;
-      this.collisionRadius = this.width / 3;
-
-      this.image = document.getElementById("playerImage");
-      this.frameX = 0;
-      this.maxFrame = 8;
-      this.frameY = 0;
-      this.fps = 20;
-      this.frameTimer = 0;
-      this.frameInterval = 1000 / this.fps;
-
-      this.speed = 0;
-      this.vy = 0;
-      this.weight = 1;
-    }
-    update(input, deltaTime, enemies) {
-      // collision detection with circles
-      enemies.forEach((enemy) => {
-        const dx = enemy.collisionX - this.collisionX;
-        const dy = enemy.collisionY - this.collisionY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < enemy.collisionRadius + this.collisionRadius) gameOver = true;
-      });
-
-      // sprite animation
-      if (this.frameTimer >= this.frameInterval) {
-        if (this.frameX >= this.maxFrame) this.frameX = 0;
-        else this.frameX++;
-        this.frameTimer = 0;
-      } else this.frameTimer += deltaTime;
-
-      // controles with keys and touch
-      if (input.keys.indexOf("ArrowRight") > -1) this.speed = 5;
-      else if (input.keys.indexOf("ArrowLeft") > -1) this.speed = -5;
-      else if (
-        (input.keys.indexOf("ArrowUp") > -1 || input.keys.indexOf("swipe up") > -1) &&
-        this.#onGround()
+    /**
+     * descriptions:
+     * this.keys.indexOf(e.key):
+     * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+     *
+     * splice():
+     * Removes elements from an array and, if necessary,
+     * inserts new elements in their place, returning the deleted elements.
+     */
+    handleKeyDown(e) {
+      if (
+        (e.key === "ArrowDown" ||
+          e.key === "ArrowUp" ||
+          e.key === "ArrowLeft" ||
+          e.key === "ArrowRight") &&
+        this.keys.indexOf(e.key) === -1
       )
-        this.vy -= 32;
-      else this.speed = 0;
-
-      // horizontal movements
-      this.x += this.speed;
-      if (this.x < 0) this.x = 0;
-      if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
-      this.collisionX = this.x + this.width / 2;
-
-      // vertical movements
-      this.y += this.vy;
-      if (!this.#onGround()) {
-        this.vy += this.weight;
-        this.maxFrame = 5;
-        this.frameY = 1;
-      } else {
-        this.vy = 0;
-        this.maxFrame = 8;
-        this.frameY = 0;
-      }
-      if (this.y >= this.gameHeight - this.height) this.y = this.gameHeight - this.height;
-      this.collisionY = this.y + this.height / 2 + 20;
+        this.keys.push(e.key);
+      else if (e.key === "Enter" && gameOver) restartGame();
+      else if (e.key === "d") debugmode = !debugmode;
     }
-    #onGround() {
-      return this.y >= this.gameHeight - this.height;
+    handleKeyUp(e) {
+      if (
+        e.key === "ArrowDown" ||
+        e.key === "ArrowUp" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight"
+      )
+        this.keys.splice(this.keys.indexOf(e.key), 1);
     }
-
-    draw(ctx) {
-      ctx.drawImage(
-        this.image,
-        this.frameX * this.spriteWidth,
-        this.frameY * this.spriteHeight,
-        this.spriteWidth,
-        this.spriteHeight,
-        this.x,
-        this.y,
-        this.width,
-        this.height
-      );
-
-      if (debugmode) {
-        ctx.save();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "red";
-        ctx.beginPath();
-        ctx.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
+    handleTouchmove(e) {
+      const swipeDistance = e.changedTouches[0].pageY - this.touchY;
+      if (swipeDistance < -this.touchTreshold && this.keys.indexOf("swipe up") === -1)
+        this.keys.push("swipe up");
+      else if (swipeDistance > this.touchTreshold && this.keys.indexOf("swipe down") === -1) {
+        this.keys.push("swipe down");
+        if (gameOver) restartGame();
       }
     }
-    restart() {
-      this.x = 100;
-      this.y = this.gameHeight - this.height;
-      this.frameX = 0;
-      this.maxFrame = 8;
-    }
-  }
-  class Background {
-    constructor(gameWidth, gameHeight) {
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-
-      this.x = 0;
-      this.y = 0;
-      this.width = 2400;
-      this.height = 720;
-
-      this.image = document.getElementById("backgroundImage");
-
-      this.speed = 5;
-    }
-    update() {
-      this.x -= this.speed;
-      if (this.x < -this.width) this.x = 0;
-    }
-    draw(ctx) {
-      // background image 1
-      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-      // background image 1 one image later
-      ctx.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
-    }
-    restart() {
-      this.x = 0;
-    }
-  }
-
-  class Enemy {
-    /** @type {HTMLCanvasElement} */
-    constructor(gameWidth, gameHeight) {
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.spriteWidth = 160;
-      this.spriteHeight = 119;
-      this.width = this.spriteWidth;
-      this.height = this.spriteHeight;
-
-      this.x = this.gameWidth;
-      this.y = this.gameHeight - this.height;
-      this.collisionX = this.x + this.width / 2 - 20;
-      this.collisionY = this.y + this.height / 2;
-      this.collisionRadius = this.width / 3;
-
-      this.image = document.getElementById("enemyImage");
-      this.frameX = 0;
-      this.maxFrame = 5;
-      this.fps = 20;
-      this.frameTimer = 0;
-      this.frameInterval = 1000 / this.fps;
-
-      this.speed = 8;
-
-      this.markedForDeletion = false;
-    }
-    update(deltaTime) {
-      // handle animation
-      if (this.frameTimer >= this.frameInterval) {
-        if (this.frameX >= this.maxFrame) this.frameX = 0;
-        else this.frameX++;
-        this.frameTimer = 0;
-      } else this.frameTimer += deltaTime;
-
-      // speed
-      this.x -= this.speed;
-      this.collisionX = this.x + this.width / 2 - 25;
-
-      // remove enemy if not displayed and increase score
-      if (this.x < -this.width) {
-        this.markedForDeletion = true;
-        score++;
-      }
-    }
-    draw(ctx) {
-      ctx.drawImage(
-        this.image,
-        this.frameX * this.spriteWidth,
-        0,
-        this.spriteWidth,
-        this.spriteHeight,
-        this.x,
-        this.y,
-        this.width,
-        this.height
-      );
-
-      if (debugmode) {
-        ctx.save();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "blue";
-        ctx.beginPath();
-        ctx.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
+    handleTouchend() {
+      this.keys.splice(this.keys.indexOf("swipe up"), 1);
+      this.keys.splice(this.keys.indexOf("swipe down"), 1);
     }
   }
 
@@ -288,31 +93,12 @@ window.addEventListener("load", () => {
 
     // update and draw the enemies
     enemies.forEach((enemy) => {
-      enemy.update(deltaTime);
-      enemy.draw(ctx);
+      score = enemy.update(deltaTime, score);
+      enemy.draw(ctx, debugmode);
     });
 
     // remove enemies
     enemies = enemies.filter((enemy) => !enemy.markedForDeletion);
-  };
-
-  const displayStatusText = (ctx) => {
-    // There is a shadow function, but the performance will be bad,
-    // so it is drawn in a different way.
-    ctx.textAlign = "left";
-    ctx.font = "40px Helvetica";
-    ctx.fillStyle = "black";
-    ctx.fillText(`Score: ${score}`, 20, 50);
-    ctx.fillStyle = "white";
-    ctx.fillText(`Score: ${score}`, 22, 52);
-
-    if (gameOver) {
-      ctx.textAlign = "center";
-      ctx.fillStyle = "black";
-      ctx.fillText("Game Over, press Enter or swipe down to reset!", canvas.width / 2, 200);
-      ctx.fillStyle = "white";
-      ctx.fillText("Game Over, press Enter or swipe down to reset!", canvas.width / 2 + 2, 202);
-    }
   };
 
   const restartGame = () => {
@@ -324,30 +110,10 @@ window.addEventListener("load", () => {
     animate(0);
   };
 
-  /**
-   * description:
-   * If you try to use "document.fullscreenElement" directly, you will get an error...
-   * "Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture."
-   * You can only handle it with a click event or something else.
-   */
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      canvas.requestFullscreen().catch((err) => {
-        alert(` Error, can't enable full-screen mode: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
-    }
-  };
-  fullScreenButton.addEventListener("click", toggleFullScreen);
-
   const input = new InputHandler();
   const player = new Player(canvas.width, canvas.height);
   const background = new Background(canvas.width, canvas.height);
 
-  let lastTime = 0;
-  let enemyTimer = 0;
-  const enemyIntervall = 1000;
   const animate = (timestamp) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let deltaTime = timestamp - lastTime;
@@ -355,11 +121,11 @@ window.addEventListener("load", () => {
 
     background.update();
     background.draw(ctx);
-    player.update(input, deltaTime, enemies);
-    player.draw(ctx);
+    gameOver = player.update(input, deltaTime, enemies, gameOver);
+    player.draw(ctx, debugmode);
 
     handleEnemies(deltaTime);
-    displayStatusText(ctx);
+    displayStatusText(ctx, canvas, score, gameOver);
 
     if (!gameOver) requestAnimationFrame(animate);
   };
