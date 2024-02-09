@@ -1,4 +1,5 @@
 import {
+  EStates,
   FallingLeft,
   FallingRight,
   JumpingLeft,
@@ -59,7 +60,7 @@ export default class Player {
       new FallingLeft(this),
       new FallingRight(this),
     ];
-    this.currentState = this.states[1];
+    this.currentState = this.states[EStates.STANDING_RIGHT];
 
     this.image = document.getElementById(imageObject.id);
     this.width = imageObject.spriteWidth;
@@ -78,7 +79,7 @@ export default class Player {
     this.maxSpeed = 10;
     this.maxJumpHeight = 40;
     this.vy = 0;
-    this.weight = 1; // gravity
+    this.gravity = 1;
   }
   draw(ctx, deltaTime) {
     if (this.frameX < this.maxFrame) {
@@ -105,12 +106,12 @@ export default class Player {
 
     // horizontal movement
     this.x += this.speed;
-    if (this.x <= 0) this.x = 0;
-    if (this.x >= this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+    if (this.onLeftWall()) this.x = 0;
+    if (this.onRightWall()) this.x = this.gameWidth - this.width;
 
     // vertical movement
     this.y += this.vy;
-    if (!this.onGround()) this.vy += this.weight;
+    if (!this.onGround()) this.vy += this.gravity;
     else this.vy = 0;
     if (this.onGround()) this.y = this.gameHeight - this.height;
   }
@@ -123,5 +124,11 @@ export default class Player {
   }
   isFalling() {
     return this.vy === 0;
+  }
+  onLeftWall() {
+    return this.x <= 0;
+  }
+  onRightWall() {
+    return this.x >= this.gameWidth - this.width;
   }
 }

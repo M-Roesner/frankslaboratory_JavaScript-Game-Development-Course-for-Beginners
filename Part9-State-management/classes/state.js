@@ -55,9 +55,10 @@ export class StandingLeft extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_RIGHT) this.player.setState(EStates.RUNNING_RIGHT);
-    else if (input.lastKey === ELastKeys.PRESS_LEFT) this.player.setState(EStates.RUNNING_LEFT);
-    else if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_LEFT);
-    else if (input.lastKey === ELastKeys.PRESS_UP) this.player.setState(EStates.JUMPING_LEFT);
+    if (input.lastKey === ELastKeys.PRESS_LEFT && !this.player.onLeftWall())
+      this.player.setState(EStates.RUNNING_LEFT);
+    if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_LEFT);
+    if (input.lastKey === ELastKeys.PRESS_UP) this.player.setState(EStates.JUMPING_LEFT);
   }
 }
 export class StandingRight extends State {
@@ -73,9 +74,10 @@ export class StandingRight extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_LEFT) this.player.setState(EStates.RUNNING_LEFT);
-    else if (input.lastKey === ELastKeys.PRESS_RIGHT) this.player.setState(EStates.RUNNING_RIGHT);
-    else if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_RIGHT);
-    else if (input.lastKey === ELastKeys.PRESS_UP) this.player.setState(EStates.JUMPING_RIGHT);
+    if (input.lastKey === ELastKeys.PRESS_RIGHT && !this.player.onRightWall())
+      this.player.setState(EStates.RUNNING_RIGHT);
+    if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_RIGHT);
+    if (input.lastKey === ELastKeys.PRESS_UP) this.player.setState(EStates.JUMPING_RIGHT);
   }
 }
 
@@ -93,7 +95,7 @@ export class SittingLeft extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_RIGHT) this.player.setState(EStates.SITTING_RIGHT);
-    else if (input.lastKey === ELastKeys.RELEAS_DOWN) this.player.setState(EStates.STANDING_LEFT);
+    if (input.lastKey === ELastKeys.RELEAS_DOWN) this.player.setState(EStates.STANDING_LEFT);
   }
 }
 export class SittingRight extends State {
@@ -109,7 +111,7 @@ export class SittingRight extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_LEFT) this.player.setState(EStates.SITTING_LEFT);
-    else if (input.lastKey === ELastKeys.RELEAS_DOWN) this.player.setState(EStates.STANDING_RIGHT);
+    if (input.lastKey === ELastKeys.RELEAS_DOWN) this.player.setState(EStates.STANDING_RIGHT);
   }
 }
 
@@ -127,8 +129,12 @@ export class RunningLeft extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_RIGHT) this.player.setState(EStates.RUNNING_RIGHT);
-    else if (input.lastKey === ELastKeys.RELEAS_LEFT) this.player.setState(EStates.STANDING_LEFT);
-    else if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_LEFT);
+    if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_LEFT);
+    if (
+      (input.lastKey === ELastKeys.PRESS_LEFT && this.player.onLeftWall()) ||
+      input.lastKey === ELastKeys.RELEAS_LEFT
+    )
+      this.player.setState(EStates.STANDING_LEFT);
   }
 }
 export class RunningRight extends State {
@@ -144,8 +150,12 @@ export class RunningRight extends State {
   }
   handleInput(input) {
     if (input.lastKey === ELastKeys.PRESS_LEFT) this.player.setState(EStates.RUNNING_LEFT);
-    else if (input.lastKey === ELastKeys.RELEAS_RIGHT) this.player.setState(EStates.STANDING_RIGHT);
-    else if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_RIGHT);
+    if (input.lastKey === ELastKeys.PRESS_DOWN) this.player.setState(EStates.SITTING_RIGHT);
+    if (
+      (input.lastKey === ELastKeys.PRESS_RIGHT && this.player.onRightWall()) ||
+      input.lastKey === ELastKeys.RELEAS_RIGHT
+    )
+      this.player.setState(EStates.STANDING_RIGHT);
   }
 }
 
