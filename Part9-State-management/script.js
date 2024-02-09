@@ -1,11 +1,17 @@
 /** @type {HTMLCanvasElement} */
+
+import InputHander from "./classes/input.js";
+import Player from "./classes/player.js";
+import { drawStatusText } from "./classes/utils.js";
+
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-
-const canvasStyle = window.getComputedStyle(canvas);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 console.log(`Canvas width: ${canvas.height}, Canvas height: ${canvas.width}`);
+
+const player = new Player(canvas.width, canvas.height);
+const input = new InputHander();
 
 window.addEventListener("load", () => {
   const loading = document.getElementById("loading");
@@ -17,7 +23,10 @@ window.addEventListener("load", () => {
     let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
 
-    // code
+    player.update(input);
+    player.draw(ctx);
+
+    drawStatusText(ctx, input, player);
 
     requestAnimationFrame(animate);
   };
