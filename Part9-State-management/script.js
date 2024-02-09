@@ -24,7 +24,7 @@ window.addEventListener("load", () => {
     lastTime = timestamp;
 
     player.update(input);
-    player.draw(ctx);
+    player.draw(ctx, deltaTime);
 
     drawStatusText(ctx, input, player);
 
