@@ -4,8 +4,8 @@ import { EStates, Falling, Jumping, Running, Sitting } from "./playerStates.js";
 export const imagePlayerObject = {
   imgTagId: "player",
   fileName: "player.png",
-  spriteWidth: 200,
-  spriteheight: 181.83,
+  spriteWidth: 100,
+  spriteHeight: 91.3,
   movements: {
     Standing: { frameY: 0, maxFrame: 6 },
     Jumping: { frameY: 1, maxFrame: 6 },
@@ -19,15 +19,15 @@ export const imagePlayerObject = {
 export class Player {
   constructor(game) {
     this.game = game;
-    this.width = 100;
-    this.height = 91.3;
+    this.width = imagePlayerObject.spriteWidth;
+    this.height = imagePlayerObject.spriteHeight;
     this.x = 0;
     this.setOnGround();
 
     this.image = document.getElementById(imagePlayerObject.imgTagId);
     this.frameX = 0;
     this.frameY = imagePlayerObject.movements.Standing.frameY;
-    this.maxFrame = 6;
+    this.maxFrame = imagePlayerObject.movements.Standing.maxFrame;
     this.fps = 20;
     this.frameInterval = 1000 / this.fps;
     this.frameTimer = 0;
@@ -82,8 +82,9 @@ export class Player {
   onGround() {
     return this.y >= this.game.height - this.height - this.game.groundMargin;
   }
-  setState(stateNumber) {
+  setState(stateNumber, isRunning) {
     this.currenState = this.states[stateNumber];
+    this.game.gameSpeed = this.game.maxGameSpeed * isRunning; // isRunning = true === 1 | false === 0
     this.currenState.enter();
   }
 

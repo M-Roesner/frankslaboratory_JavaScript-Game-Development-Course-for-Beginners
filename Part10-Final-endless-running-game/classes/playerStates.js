@@ -37,7 +37,7 @@ export class Sitting extends State {
   }
   handleInput(inputKeys) {
     if (inputKeys.includes(EInputKeys.ARROW_LEFT) || inputKeys.includes(EInputKeys.ARROW_RIGHT)) {
-      this.player.setState(EStates.RUNNING);
+      this.player.setState(EStates.RUNNING, true);
     }
   }
 }
@@ -53,9 +53,9 @@ export class Running extends State {
   }
   handleInput(inputKeys) {
     if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
-      this.player.setState(EStates.SITTING);
+      this.player.setState(EStates.SITTING, false);
     } else if (inputKeys.includes(EInputKeys.ARROW_UP)) {
-      this.player.setState(EStates.JUMPING);
+      this.player.setState(EStates.JUMPING, true);
     }
   }
 }
@@ -72,7 +72,7 @@ export class Jumping extends State {
   }
   handleInput(inputKeys) {
     if (this.player.isFalling()) {
-      this.player.setState(EStates.FALLING);
+      this.player.setState(EStates.FALLING, true);
     }
   }
 }
@@ -88,7 +88,7 @@ export class Falling extends State {
   }
   handleInput(inputKeys) {
     if (this.player.onGround()) {
-      this.player.setState(EStates.RUNNING);
+      this.player.setState(EStates.RUNNING, true);
     }
   }
 }
