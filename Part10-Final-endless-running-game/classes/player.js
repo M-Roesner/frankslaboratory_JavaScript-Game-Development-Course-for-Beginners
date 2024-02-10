@@ -36,8 +36,6 @@ export class Player {
     else this.vy = 0;
   }
   draw(ctx) {
-    ctx.strokeStyle = "red";
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
     ctx.drawImage(
       this.image,
       0 * this.width,
@@ -58,5 +56,9 @@ export class Player {
   }
   onRightWall() {
     return this.x >= this.game.width - this.width;
+  }
+  debugDraw(ctx) {
+    ctx.strokeStyle = "red";
+    ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 }

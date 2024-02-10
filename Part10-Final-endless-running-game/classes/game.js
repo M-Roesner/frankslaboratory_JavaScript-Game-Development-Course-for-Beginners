@@ -13,5 +13,11 @@ export class Game {
   draw(ctx) {
     this.player.update(this.input.keys);
     this.player.draw(ctx);
+    this.debugDraw(ctx, this.input.keys);
+  }
+  debugDraw(ctx, inputKeys) {
+    if (inputKeys.includes("d")) {
+      this.player.debugDraw(ctx);
+    }
   }
 }
