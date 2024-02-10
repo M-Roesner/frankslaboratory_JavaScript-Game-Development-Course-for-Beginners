@@ -5,13 +5,15 @@ export class Game {
   constructor(gameWidth, gameHeight) {
     this.width = gameWidth;
     this.height = gameHeight;
+    this.groundMargin = 50;
     this.player = new Player(this);
     this.input = new InputHander();
     console.log(this);
   }
-  update() {}
+  update(deltaTime) {
+    this.player.update(this.input.keys, deltaTime);
+  }
   draw(ctx) {
-    this.player.update(this.input.keys);
     this.player.draw(ctx);
     this.debugDraw(ctx, this.input.keys);
   }

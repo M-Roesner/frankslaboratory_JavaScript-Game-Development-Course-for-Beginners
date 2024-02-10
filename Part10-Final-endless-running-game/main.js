@@ -16,7 +16,8 @@ window.addEventListener("load", () => {
     let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
 
-    game.draw(ctx);
+    game.update(deltaTime);
+    game.draw(ctx, deltaTime);
 
     requestAnimationFrame(animate);
   };
