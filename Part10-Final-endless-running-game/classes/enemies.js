@@ -9,17 +9,22 @@ export const imageEnemiesObject = {
   groundEnemy: {
     imgTagId: "enemy_plant",
     fileName: "enemy_plant.png",
-    maxFrame: 5,
-    spriteWidth: 120,
-    spriteHeight: 144,
+    maxFrame: 1,
+    spriteWidth: 60,
+    spriteHeight: 87,
   },
   climbingEnemy: {
     imgTagId: "enemy_spider_big",
     fileName: "enemy_spider_big.png",
-    maxFrame: 2,
-    spriteWidth: 60,
-    spriteHeight: 87,
+    maxFrame: 5,
+    spriteWidth: 120,
+    spriteHeight: 144,
   },
+};
+export const EEnemyTypes = {
+  FLYING_ENEMY: "flyingEnemy",
+  GROUND_ENEMY: "groundEnemy",
+  CLIMBING_ENEMY: "climbingEnemy",
 };
 
 class Enemy {
@@ -71,13 +76,14 @@ export class FlyingEnemy extends Enemy {
   constructor(game) {
     super();
     this.game = game;
-    this.width = imageEnemiesObject.flyingEnemy.spriteWidth;
-    this.height = imageEnemiesObject.flyingEnemy.spriteHeight;
+    this.enemyType = EEnemyTypes.FLYING_ENEMY;
+    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
+    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
     this.x = this.game.width + Math.random() * this.game.width * 0.5;
     this.y = Math.random() * this.game.height * 0.5;
 
-    this.image = document.getElementById(imageEnemiesObject.flyingEnemy.imgTagId);
-    this.maxFrame = imageEnemiesObject.flyingEnemy.maxFrame;
+    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
+    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
 
     this.speedX = Math.random() + 1;
     this.angle = 0;
@@ -91,9 +97,18 @@ export class FlyingEnemy extends Enemy {
 }
 
 export class GroundEnemy extends Enemy {
-  constructor() {}
-  update() {}
-  draw() {}
+  constructor(game) {
+    super();
+    this.game = game;
+    this.enemyType = EEnemyTypes.GROUND_ENEMY;
+    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
+    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
+    this.x = this.game.width;
+    this.y = this.game.height - this.height - this.game.groundMargin;
+
+    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
+    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
+  }
 }
 
 export class ClimbingEnemy extends Enemy {

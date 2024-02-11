@@ -43,13 +43,14 @@ export class Game {
     this.background.draw(ctx);
     this.player.draw(ctx);
     this.enemies.forEach((enemy) => enemy.draw(ctx));
-    console.log(this.enemies);
 
     this.debugDraw(ctx, this.input.keys);
   }
   addEnemy() {
-    this.enemies.push(new FlyingEnemy(this));
-    // console.log(this.enemies);
+    if (this.gameSpeed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
+    else this.enemies.push(new FlyingEnemy(this));
+
+    console.log(this.enemies);
   }
 
   // own methods
