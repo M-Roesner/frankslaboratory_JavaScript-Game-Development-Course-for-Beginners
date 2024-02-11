@@ -88,7 +88,7 @@ export class Player {
     this.currenState.enter();
   }
 
-  // personal functions
+  // personal methods
   isFalling() {
     return this.vy > this.gravity;
   }
