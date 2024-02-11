@@ -28,17 +28,24 @@ export const EEnemyTypes = {
 };
 
 class Enemy {
-  constructor() {
+  constructor(enemyType) {
+    // animation parameters
     this.frameX = 0;
     this.frameY = 0;
     this.fps = 20;
     this.frameInterval = 1000 / this.fps;
     this.frameTimer = 0;
 
+    // set enemy type parameters
+    this.enemyType = enemyType;
+    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
+    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
+    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
+    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
+
     this.markedForDeletion = false;
 
     // initial values
-    this.maxFrame = 0;
     this.speedX = 0;
     this.speedY = 0;
   }
@@ -74,16 +81,10 @@ class Enemy {
 
 export class FlyingEnemy extends Enemy {
   constructor(game) {
-    super();
+    super(EEnemyTypes.FLYING_ENEMY);
     this.game = game;
-    this.enemyType = EEnemyTypes.FLYING_ENEMY;
-    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
-    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
     this.x = this.game.width + Math.random() * this.game.width * 0.5;
     this.y = Math.random() * this.game.height * 0.5;
-
-    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
-    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
 
     this.speedX = Math.random() + 1;
     this.angle = 0;
@@ -98,21 +99,32 @@ export class FlyingEnemy extends Enemy {
 
 export class GroundEnemy extends Enemy {
   constructor(game) {
-    super();
+    super(EEnemyTypes.GROUND_ENEMY);
     this.game = game;
-    this.enemyType = EEnemyTypes.GROUND_ENEMY;
-    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
-    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
     this.x = this.game.width;
     this.y = this.game.height - this.height - this.game.groundMargin;
-
-    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
-    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
   }
 }
 
 export class ClimbingEnemy extends Enemy {
-  constructor() {}
-  update() {}
-  draw() {}
+  constructor(game) {
+    super(EEnemyTypes.CLIMBING_ENEMY);
+    this.game = game;
+    this.x = this.game.width;
+    this.y = Math.random() * this.game.height * 0.5;
+
+    this.speedY = Math.random() * 0.5 ? 1 : -1;
+  }
+  update(deltaTime) {
+    super.update(deltaTime);
+    if (this.y > this.game.height - this.height - this.game.groundMargin) this.speedY *= -1;
+    if (this.y < -this.height) this.markedForDeletion === true;
+  }
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.moveTo(this.x + this.width * 0.5, 0);
+    ctx.lineTo(this.x + this.width * 0.5, this.y + this.height * 0.5);
+    ctx.stroke();
+    super.draw(ctx);
+  }
 }

@@ -48,7 +48,9 @@ export class Game {
   }
   addEnemy() {
     if (this.gameSpeed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
-    else this.enemies.push(new FlyingEnemy(this));
+    else if (this.gameSpeed > 0) this.enemies.push(new ClimbingEnemy(this));
+
+    this.enemies.push(new FlyingEnemy(this));
 
     console.log(this.enemies);
   }
