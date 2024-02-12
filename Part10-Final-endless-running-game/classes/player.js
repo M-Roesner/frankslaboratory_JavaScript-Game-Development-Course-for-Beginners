@@ -48,6 +48,7 @@ export class Player {
       new Falling(this.game),
       new Rolling(this.game),
     ];
+    this.currenState;
   }
   update(inputKeys, deltaTime) {
     this.checkCollision();

@@ -1,4 +1,5 @@
 import { EInputKeys } from "./input.js";
+import { Dust } from "./particles.js";
 import { imagePlayerObject } from "./player.js";
 
 /**
@@ -59,6 +60,13 @@ export class Running extends State {
     this.game.player.maxFrame = imagePlayerObject.movements.Running.maxFrame;
   }
   handleInput(inputKeys) {
+    this.game.particles.push(
+      new Dust(
+        this.game,
+        this.game.player.x + this.game.player.width * 0.6,
+        this.game.player.y + this.game.player.height
+      )
+    );
     if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
       this.game.player.setState(EStates.SITTING, 0);
     } else if (inputKeys.includes(EInputKeys.ARROW_UP)) {
