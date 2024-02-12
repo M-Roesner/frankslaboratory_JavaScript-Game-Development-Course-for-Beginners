@@ -21,14 +21,9 @@ export const imageEnemiesObject = {
     spriteHeight: 144,
   },
 };
-export const EEnemyTypes = {
-  FLYING_ENEMY: "flyingEnemy",
-  GROUND_ENEMY: "groundEnemy",
-  CLIMBING_ENEMY: "climbingEnemy",
-};
 
 class Enemy {
-  constructor(enemyType) {
+  constructor(enemyTypeData) {
     // animation parameters
     this.frameX = 0;
     this.frameY = 0;
@@ -37,11 +32,10 @@ class Enemy {
     this.frameTimer = 0;
 
     // set enemy type parameters
-    this.enemyType = enemyType;
-    this.width = imageEnemiesObject[this.enemyType].spriteWidth;
-    this.height = imageEnemiesObject[this.enemyType].spriteHeight;
-    this.image = document.getElementById(imageEnemiesObject[this.enemyType].imgTagId);
-    this.maxFrame = imageEnemiesObject[this.enemyType].maxFrame;
+    this.width = enemyTypeData.spriteWidth;
+    this.height = enemyTypeData.spriteHeight;
+    this.image = document.getElementById(enemyTypeData.imgTagId);
+    this.maxFrame = enemyTypeData.maxFrame;
 
     this.markedForDeletion = false;
 
@@ -81,7 +75,7 @@ class Enemy {
 
 export class FlyingEnemy extends Enemy {
   constructor(game) {
-    super(EEnemyTypes.FLYING_ENEMY);
+    super(imageEnemiesObject.flyingEnemy);
     this.game = game;
     this.x = this.game.width + Math.random() * this.game.width * 0.5;
     this.y = Math.random() * this.game.height * 0.5;
@@ -99,7 +93,7 @@ export class FlyingEnemy extends Enemy {
 
 export class GroundEnemy extends Enemy {
   constructor(game) {
-    super(EEnemyTypes.GROUND_ENEMY);
+    super(imageEnemiesObject.groundEnemy);
     this.game = game;
     this.x = this.game.width;
     this.y = this.game.height - this.height - this.game.groundMargin;
@@ -108,7 +102,7 @@ export class GroundEnemy extends Enemy {
 
 export class ClimbingEnemy extends Enemy {
   constructor(game) {
-    super(EEnemyTypes.CLIMBING_ENEMY);
+    super(imageEnemiesObject.climbingEnemy);
     this.game = game;
     this.x = this.game.width;
     this.y = Math.random() * this.game.height * 0.5;
