@@ -8,7 +8,8 @@ export const EInputKeys = {
 };
 
 export class InputHander {
-  constructor() {
+  constructor(game) {
+    this.game = game;
     this.keys = [];
     window.addEventListener("keydown", (e) => this.handleKeyDown(e));
     window.addEventListener("keyup", (e) => this.handleKeyUp(e));
@@ -23,9 +24,7 @@ export class InputHander {
       this.keys.indexOf(e.key) === -1
     ) {
       this.keys.push(e.key);
-    }
-    this.handleDebug(e);
-    console.log(e.key, this.keys);
+    } else if (e.key === EInputKeys.DEBUG_D) this.game.debug = !this.game.debug;
   }
   handleKeyUp(e) {
     if (
@@ -37,11 +36,5 @@ export class InputHander {
     ) {
       this.keys.splice(this.keys.indexOf(e.key), 1);
     }
-    console.log(e.key, this.keys);
-  }
-  handleDebug(e) {
-    if (e.key === EInputKeys.DEBUG_D)
-      if (this.keys.indexOf(e.key) === -1) this.keys.push(e.key);
-      else this.keys.splice(this.keys.indexOf(e.key), 1);
   }
 }

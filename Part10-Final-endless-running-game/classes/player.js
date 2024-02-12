@@ -43,6 +43,7 @@ export class Player {
     this.currenState.enter();
   }
   update(inputKeys, deltaTime) {
+    this.checkCollision();
     this.currenState.handleInput(inputKeys);
 
     // horizontal movement
@@ -67,6 +68,7 @@ export class Player {
     } else this.frameTimer += deltaTime;
   }
   draw(ctx) {
+    if (this.game.debug) this.debugDraw(ctx);
     ctx.drawImage(
       this.image,
       this.frameX * this.width,
@@ -86,6 +88,22 @@ export class Player {
     this.currenState = this.states[stateNumber];
     this.game.gameSpeed = this.game.maxGameSpeed * isRunning; // isRunning = true === 1 | false === 0
     this.currenState.enter();
+  }
+  checkCollision() {
+    this.game.enemies.forEach((enemy) => {
+      if (
+        enemy.x < this.x + this.width &&
+        enemy.x + enemy.width > this.x &&
+        enemy.y < this.y + this.height &&
+        enemy.y + enemy.height > this.y
+      ) {
+        // collision detected
+        enemy.markedForDeletion = true;
+        this.game.score++;
+      } else {
+        // no collision detected
+      }
+    });
   }
 
   // personal methods

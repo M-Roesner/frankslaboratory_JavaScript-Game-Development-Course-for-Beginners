@@ -59,6 +59,7 @@ class Enemy {
     if (this.x + this.width < 0) this.markedForDeletion = true;
   }
   draw(ctx) {
+    if (this.game.debug) this.debugDraw(ctx);
     ctx.drawImage(
       this.image,
       this.frameX * this.width,
@@ -70,6 +71,12 @@ class Enemy {
       this.width,
       this.height
     );
+  }
+
+  // own methods
+  debugDraw(ctx) {
+    ctx.strokeStyle = "red";
+    ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 }
 

@@ -1,3 +1,4 @@
+import { UI } from "./UI.js";
 import { Background } from "./background.js";
 import { FlyingEnemy, GroundEnemy, ClimbingEnemy } from "./enemies.js";
 import { InputHander } from "./input.js";
@@ -12,13 +13,19 @@ export class Game {
     this.maxGameSpeed = 6;
 
     this.player = new Player(this);
-    this.input = new InputHander();
+    this.input = new InputHander(this);
     this.background = new Background(this);
+    this.UI = new UI(this);
 
     this.enemies = [];
     this.enemyTimer = 0;
     this.enemyInterval = 1000;
     this.maxEnemies = 10;
+
+    this.debug = true;
+
+    this.score = 0;
+    this.fontColor = "black";
   }
   update(deltaTime) {
     this.background.update();
@@ -43,22 +50,12 @@ export class Game {
     this.background.draw(ctx);
     this.player.draw(ctx);
     this.enemies.forEach((enemy) => enemy.draw(ctx));
-
-    this.debugDraw(ctx, this.input.keys);
+    this.UI.draw(ctx);
   }
   addEnemy() {
     if (this.gameSpeed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
     else if (this.gameSpeed > 0) this.enemies.push(new ClimbingEnemy(this));
 
     this.enemies.push(new FlyingEnemy(this));
-
-    console.log(this.enemies);
-  }
-
-  // own methods
-  debugDraw(ctx, inputKeys) {
-    if (inputKeys.includes("d")) {
-      this.player.debugDraw(ctx);
-    }
   }
 }
