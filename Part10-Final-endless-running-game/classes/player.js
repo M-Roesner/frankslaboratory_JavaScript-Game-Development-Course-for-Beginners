@@ -1,5 +1,5 @@
 import { EInputKeys } from "./input.js";
-import { EStates, Falling, Jumping, Rolling, Running, Sitting } from "./playerStates.js";
+import { Falling, Jumping, Rolling, Running, Sitting } from "./playerStates.js";
 
 export const imagePlayerObject = {
   imgTagId: "player",
@@ -42,14 +42,12 @@ export class Player {
 
     // states
     this.states = [
-      new Sitting(this),
-      new Running(this),
-      new Jumping(this),
-      new Falling(this),
-      new Rolling(this),
+      new Sitting(this.game),
+      new Running(this.game),
+      new Jumping(this.game),
+      new Falling(this.game),
+      new Rolling(this.game),
     ];
-    this.currenState = this.states[EStates.SITTING];
-    this.currenState.enter();
   }
   update(inputKeys, deltaTime) {
     this.checkCollision();

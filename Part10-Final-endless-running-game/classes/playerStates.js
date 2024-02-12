@@ -25,109 +25,105 @@ export const EAnimatioStates = {
 };
 
 class State {
-  constructor(state) {
+  constructor(state, game) {
     this.state = state;
+    this.game = game;
   }
 }
 
 export class Sitting extends State {
-  constructor(player) {
-    super(EAnimatioStates.SITTING);
-    this.player = player;
+  constructor(game) {
+    super(EAnimatioStates.SITTING, game);
   }
   enter() {
-    this.player.frameX = 0;
-    this.player.frameY = imagePlayerObject.movements.Sitting.frameY;
-    this.player.maxFrame = imagePlayerObject.movements.Sitting.maxFrame;
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Sitting.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Sitting.maxFrame;
   }
   handleInput(inputKeys) {
     if (inputKeys.includes(EInputKeys.ARROW_LEFT) || inputKeys.includes(EInputKeys.ARROW_RIGHT)) {
-      this.player.setState(EStates.RUNNING, 1);
+      this.game.player.setState(EStates.RUNNING, 1);
     } else if (inputKeys.includes(EInputKeys.ENTER)) {
-      this.player.setState(EStates.ROLLING, 2);
+      this.game.player.setState(EStates.ROLLING, 2);
     }
   }
 }
 
 export class Running extends State {
-  constructor(player) {
-    super(EAnimatioStates.RUNNING);
-    this.player = player;
+  constructor(game) {
+    super(EAnimatioStates.RUNNING, game);
   }
   enter() {
-    this.player.frameX = 0;
-    this.player.frameY = imagePlayerObject.movements.Running.frameY;
-    this.player.maxFrame = imagePlayerObject.movements.Running.maxFrame;
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Running.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Running.maxFrame;
   }
   handleInput(inputKeys) {
     if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
-      this.player.setState(EStates.SITTING, 0);
+      this.game.player.setState(EStates.SITTING, 0);
     } else if (inputKeys.includes(EInputKeys.ARROW_UP)) {
-      this.player.setState(EStates.JUMPING, 1);
+      this.game.player.setState(EStates.JUMPING, 1);
     } else if (inputKeys.includes(EInputKeys.ENTER)) {
-      this.player.setState(EStates.ROLLING, 2);
+      this.game.player.setState(EStates.ROLLING, 2);
     }
   }
 }
 
 export class Jumping extends State {
-  constructor(player) {
-    super(EAnimatioStates.JUMPING);
-    this.player = player;
+  constructor(game) {
+    super(EAnimatioStates.JUMPING, game);
   }
   enter() {
-    this.player.frameX = 0;
-    this.player.frameY = imagePlayerObject.movements.Jumping.frameY;
-    this.player.maxFrame = imagePlayerObject.movements.Jumping.maxFrame;
-    if (this.player.onGround()) this.player.vy -= this.player.maxJumpHeight;
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Jumping.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Jumping.maxFrame;
+    if (this.game.player.onGround()) this.game.player.vy -= this.game.player.maxJumpHeight;
   }
   handleInput(inputKeys) {
-    if (this.player.isFalling()) {
-      this.player.setState(EStates.FALLING, 1);
+    if (this.game.player.isFalling()) {
+      this.game.player.setState(EStates.FALLING, 1);
     } else if (inputKeys.includes(EInputKeys.ENTER)) {
-      this.player.setState(EStates.ROLLING, 2);
+      this.game.player.setState(EStates.ROLLING, 2);
     }
   }
 }
 
 export class Falling extends State {
-  constructor(player) {
-    super(EAnimatioStates.FALLING);
-    this.player = player;
+  constructor(game) {
+    super(EAnimatioStates.FALLING, game);
   }
   enter() {
-    this.player.frameX = 0;
-    this.player.frameY = imagePlayerObject.movements.Falling.frameY;
-    this.player.maxFrame = imagePlayerObject.movements.Falling.maxFrame;
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Falling.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Falling.maxFrame;
   }
   handleInput(inputKeys) {
-    if (this.player.onGround()) {
-      this.player.setState(EStates.RUNNING, 1);
+    if (this.game.player.onGround()) {
+      this.game.player.setState(EStates.RUNNING, 1);
     }
   }
 }
 
 export class Rolling extends State {
-  constructor(player) {
-    super(EAnimatioStates.ROLLING);
-    this.player = player;
+  constructor(game) {
+    super(EAnimatioStates.ROLLING, game);
   }
   enter() {
-    this.player.frameX = 0;
-    this.player.frameY = imagePlayerObject.movements.Rolling.frameY;
-    this.player.maxFrame = imagePlayerObject.movements.Rolling.maxFrame;
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Rolling.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Rolling.maxFrame;
   }
   handleInput(inputKeys) {
-    if (!inputKeys.includes(EInputKeys.ENTER) && this.player.onGround()) {
-      this.player.setState(EStates.RUNNING, 1);
-    } else if (!inputKeys.includes(EInputKeys.ENTER) && !this.player.onGround()) {
-      this.player.setState(EStates.FALLING, 1);
+    if (!inputKeys.includes(EInputKeys.ENTER) && this.game.player.onGround()) {
+      this.game.player.setState(EStates.RUNNING, 1);
+    } else if (!inputKeys.includes(EInputKeys.ENTER) && !this.game.player.onGround()) {
+      this.game.player.setState(EStates.FALLING, 1);
     } else if (
       inputKeys.includes(EInputKeys.ENTER) &&
       inputKeys.includes(EInputKeys.ARROW_UP) &&
-      this.player.onGround()
+      this.game.player.onGround()
     ) {
-      this.player.vy -= this.player.maxJumpHeight;
+      this.game.player.vy -= this.game.player.maxJumpHeight;
     }
   }
 }

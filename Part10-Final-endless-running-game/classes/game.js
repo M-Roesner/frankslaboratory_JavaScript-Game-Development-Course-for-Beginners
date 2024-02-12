@@ -3,6 +3,7 @@ import { Background } from "./background.js";
 import { FlyingEnemy, GroundEnemy, ClimbingEnemy } from "./enemies.js";
 import { InputHander } from "./input.js";
 import { Player } from "./player.js";
+import { EStates } from "./playerStates.js";
 
 export class Game {
   constructor(gameWidth, gameHeight) {
@@ -26,6 +27,9 @@ export class Game {
 
     this.score = 0;
     this.fontColor = "black";
+
+    this.player.currenState = this.player.states[EStates.SITTING];
+    this.player.currenState.enter();
   }
   update(deltaTime) {
     this.background.update();
