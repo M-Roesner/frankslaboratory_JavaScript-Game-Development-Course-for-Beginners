@@ -1,5 +1,5 @@
 import { EInputKeys } from "./input.js";
-import { EStates, Falling, Jumping, Running, Sitting } from "./playerStates.js";
+import { EStates, Falling, Jumping, Rolling, Running, Sitting } from "./playerStates.js";
 
 export const imagePlayerObject = {
   imgTagId: "player",
@@ -13,6 +13,7 @@ export const imagePlayerObject = {
     Running: { frameY: 3, maxFrame: 8 },
     Dizzy: { frameY: 4, maxFrame: 10 },
     Sitting: { frameY: 5, maxFrame: 4 },
+    Rolling: { frameY: 6, maxFrame: 6 },
   },
 };
 
@@ -24,6 +25,7 @@ export class Player {
     this.x = 0;
     this.setOnGround();
 
+    // animation
     this.image = document.getElementById(imagePlayerObject.imgTagId);
     this.frameX = 0;
     this.frameY = imagePlayerObject.movements.Standing.frameY;
@@ -38,7 +40,14 @@ export class Player {
     this.maxJumpHeight = 27;
     this.gravity = 1;
 
-    this.states = [new Sitting(this), new Running(this), new Jumping(this), new Falling(this)];
+    // states
+    this.states = [
+      new Sitting(this),
+      new Running(this),
+      new Jumping(this),
+      new Falling(this),
+      new Rolling(this),
+    ];
     this.currenState = this.states[EStates.SITTING];
     this.currenState.enter();
   }
@@ -84,9 +93,9 @@ export class Player {
   onGround() {
     return this.y >= this.game.height - this.height - this.game.groundMargin;
   }
-  setState(stateNumber, isRunning) {
+  setState(stateNumber, runningSpeed) {
     this.currenState = this.states[stateNumber];
-    this.game.gameSpeed = this.game.maxGameSpeed * isRunning; // isRunning = true === 1 | false === 0
+    this.game.gameSpeed = this.game.maxGameSpeed * runningSpeed;
     this.currenState.enter();
   }
   checkCollision() {
