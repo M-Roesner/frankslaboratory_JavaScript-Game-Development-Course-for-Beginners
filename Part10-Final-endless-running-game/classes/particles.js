@@ -45,7 +45,6 @@ export class Splash extends Particles {
     this.y += this.gravity;
   }
   draw(ctx) {
-    ctx.strokeRect(this.x, this.y, this.size, this.size);
     ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
   }
 }

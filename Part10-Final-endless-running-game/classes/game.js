@@ -27,7 +27,9 @@ export class Game {
     this.maxEnemies = 10;
 
     this.particles = [];
-    this.maxParticles = 2000;
+    this.maxParticles = 100;
+
+    this.collisions = [];
 
     // Styles
     this.score = 0;
@@ -40,23 +42,16 @@ export class Game {
   update(deltaTime) {
     this.background.update();
     this.player.update(this.input.keys, deltaTime);
-
-    // handle enemies
-    this.handlingOfEnemiesUpdate(deltaTime);
-
-    // handle particles
-    this.particles.forEach((particle, index) => {
-      particle.update(deltaTime);
-      if (particle.markedForDeletion) this.particles.splice(index, 1);
-    });
-    if (this.particles.length > this.maxParticles)
-      this.particles = this.particles.slice(0, this.maxParticles);
+    this.handlingEnemiesUpdate(deltaTime);
+    this.handlingParticlesUpdate(deltaTime);
+    this.handlingCollisionUpdate(deltaTime);
   }
   draw(ctx) {
     this.background.draw(ctx);
     this.player.draw(ctx);
     this.enemies.forEach((enemy) => enemy.draw(ctx));
     this.particles.forEach((particle) => particle.draw(ctx));
+    this.collisions.forEach((collision) => collision.draw(ctx));
     this.UI.draw(ctx);
   }
   addEnemy() {
@@ -67,7 +62,7 @@ export class Game {
   }
 
   // own methodes
-  handlingOfEnemiesUpdate(deltaTime) {
+  handlingEnemiesUpdate(deltaTime) {
     if (this.enemyTimer > this.enemyInterval && this.enemies.length < this.maxEnemies) {
       this.addEnemy();
       this.enemyTimer = 0;
@@ -81,5 +76,19 @@ export class Game {
       // if (enemy.markedForDeletion) this.enemies.splice(this.enemies.indexOf(enemy), 1);
     });
     // this.enemies = this.enemies.filter((enemy) => !enemy.markedForDeletion);
+  }
+  handlingParticlesUpdate(deltaTime) {
+    this.particles.forEach((particle, index) => {
+      particle.update(deltaTime);
+      if (particle.markedForDeletion) this.particles.splice(index, 1);
+    });
+    if (this.particles.length > this.maxParticles)
+      this.particles = this.particles.slice(0, this.maxParticles);
+  }
+  handlingCollisionUpdate(deltaTime) {
+    this.collisions.forEach((collision, index) => {
+      collision.update(deltaTime);
+      if (collision.markedForDeletion) this.collisions.splice(index, 1);
+    });
   }
 }

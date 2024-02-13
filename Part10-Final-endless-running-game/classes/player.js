@@ -1,3 +1,4 @@
+import { collisionAnimation } from "./collisionAnimation.js";
 import { EInputKeys } from "./input.js";
 import {
   EStates,
@@ -122,6 +123,14 @@ export class Player {
         // collision detected
         enemy.markedForDeletion = true;
 
+        this.game.collisions.push(
+          new collisionAnimation(
+            this.game,
+            enemy.x + enemy.width * 0.5,
+            enemy.y + enemy.height * 0.5
+          )
+        );
+
         // [4] Rolling(this.game), [5] Diving(this.game),
         if (this.currenState === this.states[4] || this.currenState === this.states[5])
           this.game.score++;
@@ -130,7 +139,7 @@ export class Player {
     });
   }
 
-  // personal methods
+  // own methods
   isFalling() {
     return this.vy > this.gravity;
   }

@@ -143,7 +143,7 @@ export class Rolling extends State {
       this.game.player.onGround()
     ) {
       this.game.player.vy -= this.game.player.maxJumpHeight;
-    } else if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
+    } else if (inputKeys.includes(EInputKeys.ARROW_DOWN) && !this.game.player.onGround()) {
       this.game.player.setState(EStates.DIVING, 0);
     }
   }
@@ -169,7 +169,6 @@ export class Diving extends State {
     if (this.game.player.onGround()) {
       this.game.player.setState(EStates.RUNNING, 1);
       for (let i = 0; i < 30; i++) {
-        console.log(this.game.player);
         this.game.particles.unshift(
           new Splash(
             this.game,
