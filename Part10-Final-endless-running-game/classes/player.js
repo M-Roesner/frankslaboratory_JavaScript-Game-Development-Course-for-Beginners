@@ -1,5 +1,14 @@
 import { EInputKeys } from "./input.js";
-import { Falling, Jumping, Rolling, Running, Sitting } from "./playerStates.js";
+import {
+  EStates,
+  Falling,
+  Hit,
+  Diving,
+  Jumping,
+  Rolling,
+  Running,
+  Sitting,
+} from "./playerStates.js";
 
 export const imagePlayerObject = {
   imgTagId: "player",
@@ -11,7 +20,7 @@ export const imagePlayerObject = {
     Jumping: { frameY: 1, maxFrame: 6 },
     Falling: { frameY: 2, maxFrame: 6 },
     Running: { frameY: 3, maxFrame: 8 },
-    Dizzy: { frameY: 4, maxFrame: 10 },
+    Hit: { frameY: 4, maxFrame: 10 }, // Dizzy frames
     Sitting: { frameY: 5, maxFrame: 4 },
     Rolling: { frameY: 6, maxFrame: 6 },
   },
@@ -47,6 +56,8 @@ export class Player {
       new Jumping(this.game),
       new Falling(this.game),
       new Rolling(this.game),
+      new Diving(this.game),
+      new Hit(this.game),
     ];
     this.currenState;
   }
@@ -60,14 +71,17 @@ export class Player {
     else if (inputKeys.includes(EInputKeys.ARROW_LEFT)) this.speed = -this.maxSpeed;
     else this.speed = 0;
 
+    // horizontal bountaries
     if (this.onLeftWall()) this.x = 0;
-    if (this.onRightWall()) this.x = this.game.width - this.width;
+    if (this.onRightWall()) this.setToRight();
 
     // vertical movement
     this.y += this.vy;
-
     if (!this.onGround()) this.vy += this.gravity;
     else this.vy = 0;
+
+    // vertical bountaries
+    if (this.onGround()) this.setOnGround();
 
     // sprite animation
     if (this.frameTimer >= this.frameInterval) {
@@ -107,9 +121,11 @@ export class Player {
       ) {
         // collision detected
         enemy.markedForDeletion = true;
-        this.game.score++;
-      } else {
-        // no collision detected
+
+        // [4] Rolling(this.game), [5] Diving(this.game),
+        if (this.currenState === this.states[4] || this.currenState === this.states[5])
+          this.game.score++;
+        else this.setState(EStates.HIT, 0);
       }
     });
   }
@@ -123,6 +139,9 @@ export class Player {
   }
   onRightWall() {
     return this.x >= this.game.width - this.width;
+  }
+  setToRight() {
+    this.x = this.game.width - this.width;
   }
   debugDraw(ctx) {
     ctx.strokeStyle = "red";

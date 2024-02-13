@@ -1,5 +1,5 @@
 import { EInputKeys } from "./input.js";
-import { Dust, Fire } from "./particles.js";
+import { Dust, Fire, Splash } from "./particles.js";
 import { imagePlayerObject } from "./player.js";
 
 /**
@@ -92,6 +92,8 @@ export class Jumping extends State {
       this.game.player.setState(EStates.FALLING, 1);
     } else if (inputKeys.includes(EInputKeys.ENTER)) {
       this.game.player.setState(EStates.ROLLING, 2);
+    } else if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
+      this.game.player.setState(EStates.DIVING, 0);
     }
   }
 }
@@ -108,6 +110,8 @@ export class Falling extends State {
   handleInput(inputKeys) {
     if (this.game.player.onGround()) {
       this.game.player.setState(EStates.RUNNING, 1);
+    } else if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
+      this.game.player.setState(EStates.DIVING, 0);
     }
   }
 }
@@ -139,6 +143,63 @@ export class Rolling extends State {
       this.game.player.onGround()
     ) {
       this.game.player.vy -= this.game.player.maxJumpHeight;
+    } else if (inputKeys.includes(EInputKeys.ARROW_DOWN)) {
+      this.game.player.setState(EStates.DIVING, 0);
+    }
+  }
+}
+export class Diving extends State {
+  constructor(game) {
+    super(EAnimatioStates.DIVING, game);
+  }
+  enter() {
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Rolling.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Rolling.maxFrame;
+    this.game.player.vy = 15;
+  }
+  handleInput(inputKeys) {
+    this.game.particles.unshift(
+      new Fire(
+        this.game,
+        this.game.player.x + this.game.player.width * 0.5,
+        this.game.player.y + this.game.player.height * 0.5
+      )
+    );
+    if (this.game.player.onGround()) {
+      this.game.player.setState(EStates.RUNNING, 1);
+      for (let i = 0; i < 30; i++) {
+        console.log(this.game.player);
+        this.game.particles.unshift(
+          new Splash(
+            this.game,
+            this.game.player.x + this.game.player.width * 0.5,
+            this.game.player.y + this.game.player.width * 0.5
+          )
+        );
+      }
+    } else if (inputKeys.includes(EInputKeys.ENTER) && !this.game.player.onGround()) {
+      this.game.player.setState(EStates.ROLLING, 2);
+    }
+  }
+}
+export class Hit extends State {
+  constructor(game) {
+    super(EAnimatioStates.HIT, game);
+  }
+  enter() {
+    this.game.player.frameX = 0;
+    this.game.player.frameY = imagePlayerObject.movements.Hit.frameY;
+    this.game.player.maxFrame = imagePlayerObject.movements.Hit.maxFrame;
+  }
+  handleInput(inputKeys) {
+    if (this.game.player.frameX >= this.game.player.maxFrame && this.game.player.onGround()) {
+      this.game.player.setState(EStates.RUNNING, 1);
+    } else if (
+      this.game.player.frameX >= this.game.player.maxFrame &&
+      !this.game.player.onGround()
+    ) {
+      this.game.player.setState(EStates.FALLING, 1);
     }
   }
 }
