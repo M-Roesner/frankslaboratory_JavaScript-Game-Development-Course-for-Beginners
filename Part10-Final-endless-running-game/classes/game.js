@@ -13,7 +13,7 @@ export class Game {
     this.gameSpeed = 0;
     this.maxGameSpeed = 6;
 
-    this.debug = true;
+    this.debug = false;
 
     this.player = new Player(this);
     this.input = new InputHander(this);
@@ -31,15 +31,20 @@ export class Game {
 
     this.collisions = [];
 
-    // Styles
+    // Styles and win condition
     this.score = 0;
     this.fontColor = "black";
+    this.gameTimer = 0;
+    this.maxGameTimer = 20000;
+    this.gameOver = false;
+    this.winPoints = 30;
 
     // Player default settings
     this.player.currenState = this.player.states[EStates.SITTING];
     this.player.currenState.enter();
   }
   update(deltaTime) {
+    this.handlingWinCondition(deltaTime);
     this.background.update();
     this.player.update(this.input.keys, deltaTime);
     this.handlingEnemiesUpdate(deltaTime);
@@ -90,5 +95,9 @@ export class Game {
       collision.update(deltaTime);
       if (collision.markedForDeletion) this.collisions.splice(index, 1);
     });
+  }
+  handlingWinCondition(deltaTime) {
+    this.gameTimer += deltaTime;
+    if (this.gameTimer >= this.maxGameTimer) this.gameOver = true;
   }
 }

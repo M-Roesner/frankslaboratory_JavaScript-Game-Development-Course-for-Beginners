@@ -19,7 +19,7 @@ window.addEventListener("load", () => {
     game.update(deltaTime);
     game.draw(ctx, deltaTime);
 
-    requestAnimationFrame(animate);
+    if (!game.gameOver) requestAnimationFrame(animate);
   };
   animate(0);
 });
