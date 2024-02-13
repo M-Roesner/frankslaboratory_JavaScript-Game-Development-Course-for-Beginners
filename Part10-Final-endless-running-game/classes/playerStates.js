@@ -1,5 +1,5 @@
 import { EInputKeys } from "./input.js";
-import { Dust } from "./particles.js";
+import { Dust, Fire } from "./particles.js";
 import { imagePlayerObject } from "./player.js";
 
 /**
@@ -60,7 +60,7 @@ export class Running extends State {
     this.game.player.maxFrame = imagePlayerObject.movements.Running.maxFrame;
   }
   handleInput(inputKeys) {
-    this.game.particles.push(
+    this.game.particles.unshift(
       new Dust(
         this.game,
         this.game.player.x + this.game.player.width * 0.6,
@@ -122,6 +122,13 @@ export class Rolling extends State {
     this.game.player.maxFrame = imagePlayerObject.movements.Rolling.maxFrame;
   }
   handleInput(inputKeys) {
+    this.game.particles.unshift(
+      new Fire(
+        this.game,
+        this.game.player.x + this.game.player.width * 0.5,
+        this.game.player.y + this.game.player.height * 0.5
+      )
+    );
     if (!inputKeys.includes(EInputKeys.ENTER) && this.game.player.onGround()) {
       this.game.player.setState(EStates.RUNNING, 1);
     } else if (!inputKeys.includes(EInputKeys.ENTER) && !this.game.player.onGround()) {

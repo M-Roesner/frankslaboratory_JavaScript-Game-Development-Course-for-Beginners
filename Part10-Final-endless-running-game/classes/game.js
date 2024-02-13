@@ -27,6 +27,7 @@ export class Game {
     this.maxEnemies = 10;
 
     this.particles = [];
+    this.maxParticles = 2000;
 
     // Styles
     this.score = 0;
@@ -48,6 +49,8 @@ export class Game {
       particle.update(deltaTime);
       if (particle.markedForDeletion) this.particles.splice(index, 1);
     });
+    if (this.particles.length > this.maxParticles)
+      this.particles = this.particles.slice(0, this.maxParticles);
   }
   draw(ctx) {
     this.background.draw(ctx);
